@@ -4,7 +4,7 @@ Provides a GUI for CMS users to insert Pages or Object in Tinymce HTML editor.
 ## Requirements
 * SilverStripe 3.1 +
 * Tinymce
-** noneditable plugin
+ * noneditable plugin
 
 ## Installation
 Install via composer.

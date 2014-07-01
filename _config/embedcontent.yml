@@ -1,0 +1,26 @@
+---
+Name: embedcontent
+---
+EmbedContentController:
+  AdminStyleSheet: 'embedcontent/css/sample_adminembedcontent.css'
+  FrontStyleSheet: 'embedcontent/css/sample_adminembedcontent.css'
+  Templates:
+    External:
+      External:
+        Description: 'Showed using Iframe'
+    DataObject:
+      DataObjectEmbed:
+        Description: 'Block view of the DataObject'
+      DataObjectInline:
+        Description: 'Line view of the DataObject'
+        Inline: true
+    Page:
+      PageEmbed:
+        Description: 'Block view of the Page'
+      PageInline:
+        Description: 'Line view of the Page'
+        Inline: true
+  Classes:
+    embedcontent-shadow: 'Box with shadow'
+    embedcontent-rounded: 'Box with Rounded Corners'
+    embedcontent-rounded2: 'Box with 2 Rounded Corners'

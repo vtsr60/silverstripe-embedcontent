@@ -1,0 +1,21 @@
+{
+	"name": "vtsr60/silverstripe-embedcontent",
+	"type": "silverstripe-module",
+	"description": "Provides a GUI for CMS users to insert Pages or Object in Tinymce HTML editor",
+	"keywords": ["silverstripe", "content", "tinymce", "shortcode", "embedcontent"],
+	"license": "BSD License",
+	"authors": [
+		{
+			"name": "Vivakaran, Raj",
+			"email": "vstsr60@gmail.com"
+		}
+	],
+	"require": 
+	{
+		"composer/installers": "*",
+		"silverstripe/framework": ">=3.1"
+	},
+    "extra": {
+        "installer-name": "embedcontent"
+    }
+}

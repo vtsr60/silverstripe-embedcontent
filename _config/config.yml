@@ -1,0 +1,12 @@
+LeftAndMain:
+  extra_requirements_javascript:
+    - 'embedcontent/javascript/editor_plugin.js'
+    - 'embedcontent/javascript/embedcontent.js'
+  extra_requirements_css:
+    - 'embedcontent/css/embedcontent.css'
+  extensions:
+    - EmbedContentLeftAndMainExtension
+
+ContentController:
+  extensions:
+    - EmbedContentControllerExtension

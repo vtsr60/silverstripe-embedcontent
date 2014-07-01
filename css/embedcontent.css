@@ -1,0 +1,30 @@
+.htmleditorfield-embedcontent .ss-embedcontent {
+	padding: 8px 16px;
+}
+
+.htmleditorfield-embedcontent.loading .ss-embedcontent,
+.htmleditorfield-embedcontent.loading .Actions{
+	opacity: 0;
+}
+
+
+.htmleditorfield-embedcontent .ss-embedcontent .field .chzn-container{
+	max-width: 100%;
+}
+
+.defaultSkin span.mce_embedcontent{
+	background: url(../images/embedcontent_icon.png) no-repeat center center;
+}
+
+.ss-embedcontent-fields{
+    padding: 1em;
+}
+
+
+#embedContentPreviewBlock {
+    clear: both;
+    display: inline-block;
+    margin: auto;
+    padding: inherit;
+    width: 100%;
+}

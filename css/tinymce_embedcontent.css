@@ -1,0 +1,14 @@
+.mceEmbedContent{
+    border: 1px solid green;
+    word-wrap: break-word;
+}
+
+.mceEmbedContent.embedcontent-block{
+    cursor: pointer;
+    background-color: #d3d3d3;
+}
+
+.mceEmbedContent.embedcontent-empty-block{
+    border: 2px double green;
+    display: inline-block;
+}

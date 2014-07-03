@@ -28,3 +28,7 @@
     padding: inherit;
     width: 100%;
 }
+
+.embedcontent-empty-block{
+    display: inline-block;
+}

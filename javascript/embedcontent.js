@@ -52,7 +52,7 @@
                 else if(currentBlock.hasClass('embedcontent-empty-block') &&
                     $(node).hasClass('embedcontent-empty-block')){
                     contianerdata = ['EmbedContentType=Container'];
-                    console.log(/embedcontent-class-start (.*) embedcontent-class-end/.match($(node).attr('class')));
+
                     styles = parseStyleAttribute(currentBlock);
                     if(styles){
                         if(styles.width != undefined && styles.width.value != undefined
@@ -62,12 +62,16 @@
                         }
                         if(styles.height != undefined && styles.height.value != undefined
                             && $.trim(styles.height.value) != ''){
-                            contianerdata[contianerdata.height] = 'EmbedHeight='+styles.height.value;
-                            contianerdata[contianerdata.height] = 'EmbedHeightUnit='+styles.height.unit;
+                            contianerdata[contianerdata.length] = 'EmbedHeight='+styles.height.value;
+                            contianerdata[contianerdata.length] = 'EmbedHeightUnit='+styles.height.unit;
                         }
                         if(styles.float != undefined && styles.float != undefined){
-                            contianerdata[contianerdata.float] = 'EmbedFloat='+styles.float;
+                            contianerdata[contianerdata.length] = 'EmbedFloat='+styles.float;
                         }
+                    }
+                    classesParser = /embedcontent-class-start (.*) embedcontent-class-end/m.exec($(node).attr('class'));
+                    if(classesParser.length > 1 && $.trim(classesParser[1] != '')){
+                        contianerdata[contianerdata.length] = 'EmbedCSSClass='+classesParser[1];
                     }
                     $('#cms-editor-dialogs').attr('data-url-embedcontentform', $('#cms-editor-dialogs').attr('data-baseurl-embedcontentform')+'?'+contianerdata.join('&')+'&updateAction=true');
                 }
@@ -91,23 +95,21 @@
 
         $('a.ui-dialog-titlebar-close').entwine({
             onclick: function(){
-                //console.log($('form.htmleditorfield-form.htmleditorfield-embedcontent'));
                 if(currentSelectedNode.length > 0){
                     //Hack to remove the bogus P tags added around the empty block
                     if(currentSelectedNode.prev().children('br[data-mce-bogus]').length > 0 &&
                         currentSelectedNode.prev().children('br[data-mce-bogus]').length == currentSelectedNode.prev().children().length){
-                        console.log("Removing prev bogus tags");
                         currentSelectedNode.prev().remove();
                     }
                     if(currentSelectedNode.next().children('br[data-mce-bogus]').length > 0 &&
                         currentSelectedNode.next().children('br[data-mce-bogus]').length  == currentSelectedNode.next().children().length){
-                        console.log("Removing next bogus tags");
                         currentSelectedNode.next().remove();
                     }
                     currentSelectedNode = [];
                 }
             }
         });
+
         $('form.htmleditorfield-form.htmleditorfield-embedcontent').entwine({
             refreshform: function() {
                 if($('#cms-editor-dialogs').attr('data-url-embedcontentform') != $('#cms-editor-dialogs').attr('data-loadedurl-embedcontentform')){
@@ -190,7 +192,7 @@
                     blockclass = 'embedcontent-empty-block mceEmbedContent';
                 }
                 if($.trim(data.EmbedCSSClass) != ''){
-                    blockclass += 'embedcontent-class-start '+data.EmbedCSSClass+' embedcontent-class-end';
+                    blockclass += ' embedcontent-class-start '+data.EmbedCSSClass+' embedcontent-class-end';
                 }
 
                 element = $('<'+tagname+' class="'+blockclass+'" />');

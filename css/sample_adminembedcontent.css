@@ -1,8 +1,13 @@
+.embedcontent-empty-block{
+    display: inline-block;
+}
+
 .embedcontent-shadow{
     box-shadow: 5px 5px 5px #ccc;
     -moz-box-shadow: 5px 5px 5px #ccc;
     -webkit-box-shadow: 5px 5px 5px #ccc;
     margin-right: 10px;
+    border: 1px solid gray;
 }
 
 .embedcontent-rounded{
@@ -11,7 +16,8 @@
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border: 2px solid #B8CB99;
-    padding: 5px
+    padding: 5px;
+    margin: 5px;
 }
 
 .embedcontent-rounded2{

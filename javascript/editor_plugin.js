@@ -38,7 +38,6 @@
             });
 
             ed.onBeforeSetContent.add(function(ed, o) {
-                console.log("Setting the content");
                 o.content = o.content.replace(/ mceEmbedContent mceNonEditable/g, '');
                 o.content = o.content.replace(/ mceEmbedContent/g, '');
                 o.content = o.content.replace(/embedcontent-block/g, 'embedcontent-block mceEmbedContent mceNonEditable');

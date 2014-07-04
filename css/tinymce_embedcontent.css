@@ -1,14 +1,36 @@
 .mceEmbedContent{
     border: 1px solid green;
-    word-wrap: break-word;
 }
+
+.mceEmbedContent:after {
+    content: " ";
+    display: block;
+    height: 0;
+    clear: both;
+}
+
+span.mceEmbedContent {
+    vertical-align: middle;
+}
+
+span.mceEmbedContent:after {
+    content: "";
+    display: inline;
+}
+
 
 .mceEmbedContent.embedcontent-block{
     cursor: pointer;
     background-color: #d3d3d3;
+    font-size: 0;
+    padding: 2%;
+    word-wrap: break-word;
+}
+
+span.mceEmbedContent.embedcontent-block{
+    padding: 1% 2%;
 }
 
 .mceEmbedContent.embedcontent-empty-block{
     border: 2px double green;
-    display: inline-block;
 }

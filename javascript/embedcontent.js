@@ -39,7 +39,7 @@
                 else {
                     currentBlock = $(node).parents('.mceEmbedContent');
                 }
-                data = $.trim(currentBlock.text());
+                data = $.trim(currentBlock.attr('data-embed-info'));
                 currentSelectedNode = currentBlock;
                 if(currentBlock.hasClass('embedcontent-block') && data != ''
                     && data.substr(0, '[EmbedContent,'.length) == '[EmbedContent,'){
@@ -70,7 +70,7 @@
                         }
                     }
                     classesParser = /embedcontent-class-start (.*) embedcontent-class-end/m.exec($(node).attr('class'));
-                    if(classesParser.length > 1 && $.trim(classesParser[1] != '')){
+                    if(classesParser && classesParser.length > 1 && $.trim(classesParser[1] != '')){
                         contianerdata[contianerdata.length] = 'EmbedCSSClass='+classesParser[1];
                     }
                     $('#cms-editor-dialogs').attr('data-url-embedcontentform', $('#cms-editor-dialogs').attr('data-baseurl-embedcontentform')+'?'+contianerdata.join('&')+'&updateAction=true');
@@ -147,7 +147,14 @@
                         if(currentBlock.length > 0){
                             updateelement = $(this.generateContentBlock(strdata, isInline, data));
                             if(data.EmbedContentType != 'Container'){
-                                currentBlock.html(updateelement.html());
+                                if(currentBlock.attr('data-embed-info') != updateelement.attr('data-embed-info')) {
+                                    currentBlock.attr('data-embed-info', updateelement.attr('data-embed-info'));
+                                    currentBlock.attr('data-embed-key', updateelement.attr('data-embed-key'));
+                                    currentBlock.html(updateelement.html());
+                                    this.loadPreview(updateelement.attr('data-embed-info'), function (data) {
+                                        currentBlock.html(data);
+                                    });
+                                }
                             }
                             else{
                                 //Hack to remove the bogus P tags added around the empty block
@@ -171,11 +178,26 @@
                             return false;
                         }
                         else{
+                            var htmlContent = this.generateContentBlock(strdata, isInline, data);
+                            //console.log(htmlContent);
+                            var embedContentStr = '[EmbedContent'+strdata+']';
                             if(isInline){
-                                ed.replaceContent(this.generateContentBlock(strdata, isInline, data)+ " ");
+                                htmlContent += " ";
                             }
                             else {
-                                ed.replaceContent(this.generateContentBlock(strdata, isInline, data)+"<br />");
+                                htmlContent += "<br />";
+                            }
+                            //ed.replaceContent(htmlContent);
+                            if(data.EmbedContentType != 'Container') {
+                                this.loadPreview(embedContentStr, function (data) {
+                                    var embedcontent = $('<div>' + htmlContent + '</div>');
+                                    embedcontent.find('.embedcontent-block').html(data);
+                                    //console.log(embedcontent.html());
+                                    ed.replaceContent(embedcontent.html());
+                                });
+                            }
+                            else {
+                                ed.replaceContent(htmlContent);
                             }
                         }
                     }
@@ -200,7 +222,9 @@
                     element.append('<p>&nbsp;</p>');
                 }
                 else {
-                    element.append('[EmbedContent'+strdata+']');
+                    element.append('<p>Loading ....</p>');
+                    element.attr('data-embed-info','[EmbedContent'+strdata+']');
+                    element.attr('data-embed-key',this.generateKey('[EmbedContent'+strdata+']'));
                 }
                 if($.trim(data.EmbedWidth) != ''){
                     element.css('width', data.EmbedWidth+data.EmbedWidthUnit);
@@ -215,10 +239,13 @@
                 }
 
                 return $('<div/>').append(element).html();
-            }
-        });
-        $('#embedContentPreviewBlock').entwine({
-            loadPreview: function(data){
+            },
+            generateKey: function(data){
+                data = data.replace('[EmbedContent,', '');
+                data = data.replace(/[^a-z0-9]/gmi, '');
+                return data;
+            },
+            loadPreview: function(data, callback){
                 var previewURL = 'EmbedContentController/PreviewEmbedContent/forTemplate';
                 if($.trim(data) != ''){
                     var getdata = {};
@@ -227,15 +254,18 @@
                     data = data.replace(/="/g, '=');
                     data = data.replace(/",/g, ',');
                     previewURL += '?'+data.split(',').join('&');
-                    $.get(previewURL).done(function(data){
-                        $('#embedContentPreviewBlock').html(data);
+                    $.ajax({
+                        url: previewURL,
+                        async: false,
+                        success: function (data) {
+                            console.log(data);
+                            callback(data);
+                        }
                     });
-
-                    return true;
                 }
-                return false;
             }
         });
+
 
 	});
 })(jQuery);

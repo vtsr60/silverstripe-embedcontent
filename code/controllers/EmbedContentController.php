@@ -128,7 +128,7 @@ class EmbedContentController extends Controller{
         if(!Permission::check('CMS_ACCESS_CMSMain')) return;
         $params = $this->request->requestVars();
         $html = self::get_embed_content($params);
-        if((isset($params['EmbedWidth']) && trim($params['EmbedWidth']) != '')
+        /*if((isset($params['EmbedWidth']) && trim($params['EmbedWidth']) != '')
             ||(isset($params['EmbedHeight']) && trim($params['EmbedHeight']) != '')
             || (isset($params['EmbedFloat']) && trim($params['EmbedFloat']) != '')
             || (isset($params['EmbedCSSClass']) && trim($params['EmbedCSSClass']) != '')){
@@ -153,7 +153,7 @@ class EmbedContentController extends Controller{
                 $class = trim($params['EmbedCSSClass']);
             }
             $html = "<div class='embedcontent-block $class' $style>".$html."</div>";
-        }
+        }*/
         return $html;
     }
 

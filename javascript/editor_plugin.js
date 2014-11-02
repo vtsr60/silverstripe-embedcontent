@@ -18,30 +18,50 @@
                     active = jQuery(node).hasClass('mceEmbedContent');
                     control = ed.controlManager.get('embedcontent').setActive(active);
                     data = ed.selection.getContent({format : 'text'});
-                    if(active && jQuery.trim(data) != '' && !jQuery(node).hasClass('embedcontent-empty-block')){
-                        jQuery('#embedContentPreviewBlock').remove();
-                        preview = jQuery("<div id='embedContentPreviewBlock' class='message good'><p>Loading...</p></div>");
-                        if(preview.entwine('ss').loadPreview(jQuery.trim(data))){
-                            jQuery(ed.container).parent().append(preview);
-                        }
-                    }
-                    else {
-                        jQuery('#embedContentPreviewBlock').remove();
-                    }
                 });
                 ed.dom.loadCSS('embedcontent/css/tinymce_embedcontent.css');
             });
 
             ed.onSaveContent.add(function(ed, o) {
-                o.content = o.content.replace(/ mceEmbedContent mceNonEditable/g, '');
-                o.content = o.content.replace(/ mceEmbedContent/g, '');
+                var content = jQuery('<div>'+o.content+'</div>');
+                content.find('.mceNonEditable').removeClass('mceNonEditable');
+                content.find('.mceEmbedContent').removeClass('mceEmbedContent');
+                content.find('.embedcontent-block').each(function(){
+                    jQuery(this).html(jQuery(this).attr('data-embed-info'));
+                });
+                o.content = content.html();
             });
 
             ed.onBeforeSetContent.add(function(ed, o) {
-                o.content = o.content.replace(/ mceEmbedContent mceNonEditable/g, '');
-                o.content = o.content.replace(/ mceEmbedContent/g, '');
-                o.content = o.content.replace(/embedcontent-block/g, 'embedcontent-block mceEmbedContent mceNonEditable');
-                o.content = o.content.replace(/embedcontent-empty-block/g, 'embedcontent-empty-block mceEmbedContent');
+                var content = jQuery('<div>'+o.content+'</div>');
+                content.find('.mceNonEditable').removeClass('mceNonEditable');
+                content.find('.mceEmbedContent').removeClass('mceEmbedContent');
+                content.find('.embedcontent-block').addClass('mceEmbedContent');
+                content.find('.embedcontent-block').addClass('mceNonEditable');
+                content.find('.embedcontent-empty-block').addClass('mceEmbedContent');
+                content.find('.embedcontent-block').html('<p>Loading ...</p>')
+                content.find('.embedcontent-block').each(function(){
+                    var previewURL = 'EmbedContentController/PreviewEmbedContent/forTemplate';
+                    var data = jQuery(this).attr('data-embed-info');
+                    var currentelement = jQuery(this);
+                    if(jQuery.trim(data) != ''){
+                        var getdata = {};
+                        data = data.replace('[EmbedContent,', '');
+                        data = data.replace('"]', '');
+                        data = data.replace(/="/g, '=');
+                        data = data.replace(/",/g, ',');
+                        previewURL += '?'+data.split(',').join('&');
+                        jQuery.ajax({
+                            url: previewURL,
+                            async: false,
+                            success: function (data) {
+                                currentelement.html(data);
+                            }
+                        });
+                    }
+                });
+                o.content = content.html();
+
             });
 
 			ed.addButton('embedcontent', {title : 'Insert Content', cmd : 'embedcontent', 'class' : 'mce_embedcontent'});

@@ -1,5 +1,5 @@
 .mceEmbedContent{
-    border: 1px solid green;
+
 }
 
 .mceEmbedContent:after {
@@ -22,13 +22,16 @@ span.mceEmbedContent:after {
 .mceEmbedContent.embedcontent-block{
     cursor: pointer;
     background-color: #d3d3d3;
-    font-size: 0;
-    padding: 2%;
     word-wrap: break-word;
 }
 
+.mceEmbedContent.embedcontent-block .embedcontent-item{
+    padding: 2%;
+    border: 1px solid green;
+}
+
 span.mceEmbedContent.embedcontent-block{
-    padding: 1% 2%;
+    padding: 0 1%;
 }
 
 .mceEmbedContent.embedcontent-empty-block{

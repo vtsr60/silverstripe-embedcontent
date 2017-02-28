@@ -5,22 +5,26 @@
  * @package EmbedContent
  * @author Vivakaran, Raj
  **/
-class EmbedContentController extends Controller{
-	private static $allowed_actions = array(
-		'EmbedContentForm',
+class EmbedContentController extends Controller
+{
+    private static $allowed_actions = array(
+        'EmbedContentForm',
         'PreviewEmbedContent'
-	);
+    );
 
     private static $embedTemplates = array();
     private static $embedTemplatesInlines = array();
     private static $cssClasses = array(' ' => 'None');
 
-	/**
-	 * Provides a GUI for the insert embed content popup
-	 * @return Form
-	 **/
-	public function EmbedContentForm(){
-		if(!Permission::check('CMS_ACCESS_CMSMain')) return;
+    /**
+     * Provides a GUI for the insert embed content popup
+     * @return Form
+     **/
+    public function EmbedContentForm()
+    {
+        if (!Permission::check('CMS_ACCESS_CMSMain')) {
+            return;
+        }
         $contenttype = $this->request->requestVar('EmbedContentType');
         $allContentTypes = array('Container' => 'Empty Block',
                                     'Page' => 'Pages in the Site Tree',
@@ -37,28 +41,27 @@ class EmbedContentController extends Controller{
                 ->setHasEmptyDefault(true)
                 ->addExtraClass('reloadFormOnSelect')
         );
-        if($contenttype){
-            if($contenttype == 'External'){
+        if ($contenttype) {
+            if ($contenttype == 'External') {
                 $fields[] = TextField::create('ExternalURL', 'External URL', $this->request->requestVar('ExternalURL'));
-            }
-            elseif($contenttype == 'DataObject' || $contenttype == 'Page') {
+            } elseif ($contenttype == 'DataObject' || $contenttype == 'Page') {
                 $allDataObjectClasses = ClassInfo::subclassesFor($contenttype);
                 $dataobjecttype = $this->request->requestVar('EmbedContentDataObjectType');
                 $fields[] = DropdownField::create('EmbedContentDataObjectType', 'Data Object Type', $allDataObjectClasses, $dataobjecttype)
                                 ->setHasEmptyDefault(true)
                                 ->addExtraClass('reloadFormOnSelect');
-                if($dataobjecttype){
+                if ($dataobjecttype) {
                     $fields[] = DropdownField::create('EmbedContentDataObjectID', 'Please choose an object', Dataobject::get($dataobjecttype)->map("ID", "Title"), $this->request->requestVar('EmbedContentDataObjectID'))
                                 ->setHasEmptyDefault(true);
                 }
             }
 
-            if($contenttype != 'Container'){
+            if ($contenttype != 'Container') {
                 $fields[] = DropdownField::create('EmbedTemplate', 'Please choose an View', self::getTemplates($contenttype), $this->request->requestVar('EmbedTemplate'))
                     ->setHasEmptyDefault(false);
             }
 
-            if(!self::isInlineTemplate($contenttype, $this->request->requestVar('EmbedTemplate')) || $contenttype == 'Container'){
+            if (!self::isInlineTemplate($contenttype, $this->request->requestVar('EmbedTemplate')) || $contenttype == 'Container') {
                 $widthField = new FieldGroup(
                     TextField::create('EmbedWidth', 'Value', $this->request->requestVar('EmbedWidth')),
                     DropdownField::create('EmbedWidthUnit',
@@ -88,7 +91,7 @@ class EmbedContentController extends Controller{
                                                             'right' => 'Right'),
                                                     $this->request->requestVar('EmbedFloat'));
             }
-            if(self::hasCSSClasses()){
+            if (self::hasCSSClasses()) {
                 $fields[] = DropdownField::create('EmbedCSSClass',
                                                     'CSS Class',
                                                     self::getCSSClasses(),
@@ -104,28 +107,31 @@ class EmbedContentController extends Controller{
 
         $ActionName = "Insert/Update Content";
 
-		// actions
-		$actions = FieldList::create(array(				
-			FormAction::create('insert', _t('Embedcontent.BUTTONINSERTSHORTCODE', $ActionName))
-				->addExtraClass('ss-ui-action-constructive')
-				->setAttribute('data-icon', 'accept')
-				->setUseButtonTag(true)
-		));	
+        // actions
+        $actions = FieldList::create(array(
+            FormAction::create('insert', _t('Embedcontent.BUTTONINSERTSHORTCODE', $ActionName))
+                ->addExtraClass('ss-ui-action-constructive')
+                ->setAttribute('data-icon', 'accept')
+                ->setUseButtonTag(true)
+        ));
 
-		// form
-		$form = Form::create($this, "EmbedContentForm", $fields, $actions)
-			->loadDataFrom($this)
-			->addExtraClass('htmleditorfield-form htmleditorfield-embedcontent cms-dialog-content');
-		
-		return $form;
-	}
+        // form
+        $form = Form::create($this, "EmbedContentForm", $fields, $actions)
+            ->loadDataFrom($this)
+            ->addExtraClass('htmleditorfield-form htmleditorfield-embedcontent cms-dialog-content');
+        
+        return $form;
+    }
 
     /**
      * Provides a API for the preview embed content
      * @return HTML
      **/
-    public function PreviewEmbedContent(){
-        if(!Permission::check('CMS_ACCESS_CMSMain')) return;
+    public function PreviewEmbedContent()
+    {
+        if (!Permission::check('CMS_ACCESS_CMSMain')) {
+            return;
+        }
         $params = $this->request->requestVars();
         $html = self::get_embed_content($params);
         /*if((isset($params['EmbedWidth']) && trim($params['EmbedWidth']) != '')
@@ -165,15 +171,15 @@ class EmbedContentController extends Controller{
      * @param object|null $parser
      * @return string|void
      */
-    public static function get_embed_content($arguments, $content = null, $parser = null) {
+    public static function get_embed_content($arguments, $content = null, $parser = null)
+    {
         $embedTemplatePath = 'EmbedContent/';
-        if(count($arguments) && isset($arguments['EmbedContentType'])){
-            if($arguments['EmbedContentType'] == 'External' && isset($arguments['EmbedTemplate'])){
+        if (count($arguments) && isset($arguments['EmbedContentType'])) {
+            if ($arguments['EmbedContentType'] == 'External' && isset($arguments['EmbedTemplate'])) {
                 $controller = Controller::curr();
                 return $controller->customise($arguments)->renderWith($embedTemplatePath.$arguments['EmbedTemplate']);
-            }
-            elseif(isset($arguments['EmbedContentDataObjectType']) && isset($arguments['EmbedContentDataObjectType'])
-                    && is_numeric($arguments['EmbedContentDataObjectID']) && isset($arguments['EmbedTemplate'])){
+            } elseif (isset($arguments['EmbedContentDataObjectType']) && isset($arguments['EmbedContentDataObjectType'])
+                    && is_numeric($arguments['EmbedContentDataObjectID']) && isset($arguments['EmbedTemplate'])) {
                 //Remove the extra ::inline
                 $arguments['EmbedTemplate'] = str_replace('::inline', '', $arguments['EmbedTemplate']);
 
@@ -191,23 +197,23 @@ class EmbedContentController extends Controller{
      * Get list of templates for give insert content type
      * @return Array
      */
-    public static function getTemplates($type){
-        if(!count(self::$embedTemplates)){
-            foreach(Config::inst()->get('EmbedContentController', 'Templates') as $templatetype => $templates){
+    public static function getTemplates($type)
+    {
+        if (!count(self::$embedTemplates)) {
+            foreach (Config::inst()->get('EmbedContentController', 'Templates') as $templatetype => $templates) {
                 self::$embedTemplates[$templatetype] = array();
-                foreach($templates as $name => $desc){
-                    if(isset($desc['Inline']) && $desc['Inline']){
-                        if(!isset(self::$embedTemplatesInlines[$templatetype])){
+                foreach ($templates as $name => $desc) {
+                    if (isset($desc['Inline']) && $desc['Inline']) {
+                        if (!isset(self::$embedTemplatesInlines[$templatetype])) {
                             self::$embedTemplatesInlines[$templatetype] = array();
                         }
                         $name = $name.'::inline';
                         self::$embedTemplatesInlines[$templatetype][] = $name;
                     }
 
-                    if(isset($desc['Description'])){
+                    if (isset($desc['Description'])) {
                         self::$embedTemplates[$templatetype][$name] = $desc['Description'];
-                    }
-                    else {
+                    } else {
                         self::$embedTemplates[$templatetype][$name] = $name;
                     }
                 }
@@ -220,7 +226,8 @@ class EmbedContentController extends Controller{
      * Check if given content type has any template
      * @return Boolean
      */
-    public static function hasTemplates($type){
+    public static function hasTemplates($type)
+    {
         return isset(self::$embedTemplates[$type]) && count(self::$embedTemplates[$type]);
     }
 
@@ -228,7 +235,8 @@ class EmbedContentController extends Controller{
      * Check if given content type and template combination is inline template
      * @return Boolean
      */
-    public static function isInlineTemplate($type, $template){
+    public static function isInlineTemplate($type, $template)
+    {
         return isset(self::$embedTemplatesInlines[$type]) && in_array($template, self::$embedTemplatesInlines[$type]);
     }
 
@@ -236,14 +244,14 @@ class EmbedContentController extends Controller{
      * Clear all the template setting information
      *
      */
-    public static function clearTemplates($type = false){
-        if($type && isset(self::$embedTemplates[$type])){
+    public static function clearTemplates($type = false)
+    {
+        if ($type && isset(self::$embedTemplates[$type])) {
             self::$embedTemplates[$type] = array();
-            if(isset(self::$embedTemplatesInlines[$type])){
+            if (isset(self::$embedTemplatesInlines[$type])) {
                 self::$embedTemplatesInlines[$type] = array();
             }
-        }
-        else {
+        } else {
             self::$embedTemplates = array();
         }
     }
@@ -252,8 +260,9 @@ class EmbedContentController extends Controller{
      * Get list of CSS Class applied to embed content
      * @return Array
      */
-    public static function getCSSClasses(){
-        if(count(self::$cssClasses) <= 1){
+    public static function getCSSClasses()
+    {
+        if (count(self::$cssClasses) <= 1) {
             self::$cssClasses = array_merge(self::$cssClasses, Config::inst()->get('EmbedContentController', 'Classes'));
         }
         return self::$cssClasses;
@@ -263,7 +272,8 @@ class EmbedContentController extends Controller{
      * Check if any CSS class is present to add to embed content
      * @return Array
      */
-    public static function hasCSSClasses(){
+    public static function hasCSSClasses()
+    {
         self::getCSSClasses();//Make sure the setting is loaded from config
         return count(self::$cssClasses) > 1;
     }
@@ -272,36 +282,38 @@ class EmbedContentController extends Controller{
      * Clear all the CSS classes information
      *
      */
-    public static function clearCSSClasses(){
+    public static function clearCSSClasses()
+    {
         self::$cssClasses = array(' ' => 'None');
     }
-
 }
 
 /*
  * Extension class to added extra CSS to the CMS Admin for preview the embed content
  * Only added ths CSS files if provided in setting
  */
-class EmbedContentLeftAndMainExtension extends LeftAndMainExtension {
+class EmbedContentLeftAndMainExtension extends LeftAndMainExtension
+{
 
-    public function init() {
-        if(Config::inst()->get('EmbedContentController', 'AdminStyleSheet')){
+    public function init()
+    {
+        if (Config::inst()->get('EmbedContentController', 'AdminStyleSheet')) {
             Requirements::css(Config::inst()->get('EmbedContentController', 'AdminStyleSheet'));
         }
     }
-
 }
 
 /*
  * Extension class to added extra CSS to the CMS Front end for embed content
  * Only added ths CSS files if provided in setting
  */
-class EmbedContentControllerExtension extends Extension {
+class EmbedContentControllerExtension extends Extension
+{
 
-    public function onAfterInit() {
-        if(Config::inst()->get('EmbedContentController', 'FrontStyleSheet')){
+    public function onAfterInit()
+    {
+        if (Config::inst()->get('EmbedContentController', 'FrontStyleSheet')) {
             Requirements::css(Config::inst()->get('EmbedContentController', 'FrontStyleSheet'));
         }
     }
-
 }
